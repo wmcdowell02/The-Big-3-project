@@ -44,6 +44,6 @@ def extract_and_save_best_face(input_images, output_folder):
             print(f"No faces detected in Image {i + 1}")
 
 # Example usage
-input_images = ['Olivia1.jpg', 'Matthew1.jpg', 'William1.jpg']  # Replace with the paths to your input images
+input_images = ['databases/Olivia/Olivia1.jpg', 'databases/Matthew/Matthew1.jpg', 'databases/William/William1.jpg']
 output_folder = 'best_faces'  # Folder where best faces will be saved
 extract_and_save_best_face(input_images, output_folder)
