@@ -36,14 +36,17 @@ def extract_and_save_best_face(input_images, output_folder):
             x, y, w, h = faces[best_face_idx]
             best_face = image[y:y+h, x:x+w]
             
-            # Save the best face as an image
-            output_path = os.path.join(output_folder, f"best_face_{i + 1}.jpg")
+            # Get the filename without extension
+            filename_without_extension = os.path.splitext(os.path.basename(image_path))[0]
+            
+            # Save the best face as an image with the original image's filename followed by "_face"
+            output_path = os.path.join(output_folder, f"{filename_without_extension}_face.jpg")
             cv2.imwrite(output_path, best_face)
-            print(f"Best Face from Image {i + 1} saved as {output_path}")
+            print(f"Face from Image {i + 1} saved as {output_path}")
         else:
             print(f"No faces detected in Image {i + 1}")
 
 # Example usage
-input_images = ['databases/Olivia/Olivia1.jpg', 'databases/Matthew/Matthew1.jpg', 'databases/William/William1.jpg']
+input_images = ['databases/Olivia/Olivia1.jpg', 'databases/Matthew/Matthew1.jpg', 'databases/William/William1.jpg']  # Replace with the paths to your input images
 output_folder = 'best_faces'  # Folder where best faces will be saved
 extract_and_save_best_face(input_images, output_folder)
