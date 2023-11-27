@@ -5,15 +5,17 @@ Created on Sun Nov 26 22:22:09 2023
 @author: William McDowell
 """
 
-from deepface import DeepFace
-import os
 import cv2
+import os
 import numpy as np
+from scipy.spatial import distance as dist
+from deepface import DeepFace
+
 
 
 # Paths to the folders containing the face cutouts and the database of photos for verification
 folder_cutouts = 'C:/Users/William McDowell/OneDrive/Fall 2023/M E 369P/Project/face_cutouts'
-folder_photos = '"C:/Users/William McDowell/OneDrive/Fall 2023/M E 369P/Project/databases"'
+folder_photos = 'C:/Users/William McDowell/OneDrive/Fall 2023/M E 369P/Project/databases'
 # Load face recognition model
 model = DeepFace.build_model("Facenet")
 
@@ -44,7 +46,8 @@ def extract_embeddings_from_database(database_path):
     for folder in os.listdir(database_path):
         folder_path = os.path.join(database_path, folder)
         if os.path.isdir(folder_path):
-            database_embeddings[folder] = extract_embeddings_from_folder(folder_path)
+            folder_embeddings = extract_embeddings_from_folder(folder_path)
+            database_embeddings[folder] = folder_embeddings
     return database_embeddings
 
 # Extract embeddings from the cutouts and database folders
@@ -52,11 +55,11 @@ cutouts_embeddings = extract_embeddings_from_folder(folder_cutouts)
 database_embeddings = extract_embeddings_from_database(folder_photos)
 
 # Perform face verification
-for cutout_name, cutout_embedding in cutouts_embeddings.items():
+for cutout_embedding in cutouts_embeddings:
     for folder_name, folder_embeddings in database_embeddings.items():
         for photo_embedding in folder_embeddings:
-            distance = DeepFace.distance(cutout_embedding, photo_embedding)
+            distance = dist.cosine(cutout_embedding, photo_embedding)
             if distance < 0.6:  # Adjust the threshold as needed
-                print(f"Match found: {cutout_name} matches a photo in folder {folder_name}")
+                print(f"Match found: a cutout matches a photo in folder {folder_name}")
             else:
-                print(f"No match: {cutout_name} does not match any photo in folder {folder_name}")
+                print(f"No match: a cutout does not match any photo in folder {folder_name}")
