@@ -43,7 +43,7 @@ def verify_face(detected_embedding, database_embeddings):
     return None  # Return None if no match is found
 
 # Load embeddings from the database folder
-database_path = 'C:/Users/William McDowell/OneDrive/Fall 2023/M E 369P/Project/databases'
+database_path = '' # Path to database of best faces
 known_embeddings = {}
 
 for person_folder in os.listdir(database_path):
