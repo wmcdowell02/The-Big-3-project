@@ -1,7 +1,7 @@
 import cv2
 import csv
 from deepface import DeepFace
-import os  # Import the os module
+import os
 
 # Set the default model to VGG-Face for DeepFace
 DeepFace.build_model("VGG-Face")
@@ -47,14 +47,25 @@ def analyze_and_store_face(image_path):
             # Adjust the following line based on the actual list structure
             analysis_data = analysis[0] if len(analysis) > 0 else {}
 
-            # Determine the dominant gender based on a threshold (e.g., 90% confidence)
-            gender_confidence = analysis_data.get('gender', {})
-            dominant_gender = 'Woman' if gender_confidence.get('Woman', 0) > 90 else 'Man'
+            # Get gender predictions with confidence scores
+            gender_predictions = analysis_data.get('gender', {})
+
+            # Choose the dominant gender with a flexible threshold
+            dominant_gender = None
+            max_confidence = 0
+
+            for gender, confidence in gender_predictions.items():
+                if confidence > max_confidence:
+                    dominant_gender = gender
+                    max_confidence = confidence
+
+            if dominant_gender is None:
+                dominant_gender = 'N/A'
 
             main_attributes = {
                 'image_title': os.path.splitext(os.path.basename(image_path))[0],  # Extract image title
                 'age': analysis_data.get('age'),
-                'gender': dominant_gender,  # Export only the dominant gender
+                'gender': dominant_gender,
                 'race': analysis_data.get('dominant_race', 'N/A'),
                 'emotion': analysis_data.get('dominant_emotion', 'N/A')
             }
@@ -94,5 +105,3 @@ for path in best_face_paths:
             writer.writerow(face_data)
 
 print("Face analysis completed and saved to CSV.")
-
-
