@@ -37,7 +37,7 @@ def verify_face(detected_embedding, database_embeddings, threshold=0.08):  # Adj
     return None  # Return None if no match is found
 
 # Load embeddings from the "best_faces" folder
-best_faces_path = 'C:/Users/Administrator/Desktop/App programming Project/The-Big-3-project-main/The-Big-3-project-main/best_faces'
+best_faces_path = '' # Add the path to the 'best_faces' folder generated in the Face_Storage3ppl.py file
 known_embeddings = {}
 
 for filename in os.listdir(best_faces_path):
