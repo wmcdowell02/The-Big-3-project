@@ -27,14 +27,14 @@ def analyze_and_store_face(image_path):
         return None
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(50, 50))
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(30, 30))
 
     if len(faces) != 1:
         print(f"Error: A single face should be detected in {image_path}. Detected {len(faces)} faces.")
         return None
 
     try:
-        analysis = DeepFace.analyze(image_path, actions=['age', 'gender', 'race', 'emotion'])
+        analysis = DeepFace.analyze(image_path, actions=['age', 'gender', 'race', 'emotion'], enforce_detection=False)
         if isinstance(analysis, list):
             analysis_data = analysis[0] if len(analysis) > 0 else {}
             gender_confidence = analysis_data.get('gender', {})
