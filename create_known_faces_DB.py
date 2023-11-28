@@ -79,7 +79,7 @@ def initialize_csv(file_name):
         print(f"Error initializing CSV: {e}")
 
 # Paths to the best faces from the previous program
-best_face_paths = ['best_faces/Olivia1_face.jpg', 'best_faces/Matthew1_face.jpg', 'best_faces/William1_face.jpg']
+best_face_paths = [] # A list of strings of the paths to the best faces
 
 # Initialize the CSV file with column headers
 initialize_csv(csv_file)
