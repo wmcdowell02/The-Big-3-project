@@ -36,21 +36,20 @@ def verify_face(detected_embedding, database_embeddings, threshold=0.08):  # Adj
                 return person_name  # Return the matched person's name
     return None  # Return None if no match is found
 
-# Load embeddings from the database folder
-database_path = # Path to database of unknown faces detected and clipped
+# Load embeddings from the "best_faces" folder
+best_faces_path = 'C:/Users/Administrator/Desktop/App programming Project/The-Big-3-project-main/The-Big-3-project-main/best_faces'
 known_embeddings = {}
 
-for person_folder in os.listdir(database_path):
-    person_folder_path = os.path.join(database_path, person_folder)
-    if os.path.isdir(person_folder_path):
-        embeddings = []
-        for filename in os.listdir(person_folder_path):
-            img_path = os.path.join(person_folder_path, filename)
-            img = cv2.imread(img_path)
-            if img is not None:
-                img_embedding = extract_embedding(img)
-                embeddings.append(img_embedding)
-        known_embeddings[person_folder] = embeddings
+for filename in os.listdir(best_faces_path):
+    img_path = os.path.join(best_faces_path, filename)
+    img = cv2.imread(img_path)
+    if img is not None:
+        img_embedding = extract_embedding(img)
+        # Use the file name (without extension) as the person's name
+        person_name = os.path.splitext(filename)[0]
+        if person_name not in known_embeddings:
+            known_embeddings[person_name] = []
+        known_embeddings[person_name].append(img_embedding)
 
 # Initialize camera capture
 camera = cv2.VideoCapture(0)  # 0 for default camera
