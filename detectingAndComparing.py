@@ -1,15 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Nov 27 18:14:55 2023
-
-@author: William McDowell
-"""
-
 import cv2
 import os
 import numpy as np
 from scipy.spatial import distance as dist
 from deepface import DeepFace
+import time
 
 # Load face recognition model
 model = DeepFace.build_model("Facenet")
@@ -34,16 +28,16 @@ def cosine_distance(emb1, emb2):
     return dist.cosine(emb1, emb2)
 
 # Function to verify if the detected face matches with the database
-def verify_face(detected_embedding, database_embeddings):
+def verify_face(detected_embedding, database_embeddings, threshold=0.08):  # Adjust the threshold as needed
     for person_name, embeddings in database_embeddings.items():
         for known_embedding in embeddings:
             distance = cosine_distance(detected_embedding, known_embedding)
-            if distance < 0.08:  # Adjust the threshold as needed
+            if distance < threshold:
                 return person_name  # Return the matched person's name
     return None  # Return None if no match is found
 
 # Load embeddings from the database folder
-database_path = '' # Path to database of best faces
+database_path = 'C:/Users/Administrator/Desktop/App programming Project/The-Big-3-project-main/The-Big-3-project-main/best_faces'
 known_embeddings = {}
 
 for person_folder in os.listdir(database_path):
@@ -59,7 +53,28 @@ for person_folder in os.listdir(database_path):
         known_embeddings[person_folder] = embeddings
 
 # Initialize camera capture
-camera = cv2.VideoCapture(0)  # 0 for default camera, change if needed
+camera = cv2.VideoCapture(0)  # 0 for default camera
+
+# Set up for handling unrecognized faces
+unrecognized_face_path = 'unrecognized_faces'
+os.makedirs(unrecognized_face_path, exist_ok=True)
+
+# Function to load embeddings of unrecognized faces
+def load_unrecognized_embeddings():
+    embeddings = []
+    for filename in os.listdir(unrecognized_face_path):
+        img_path = os.path.join(unrecognized_face_path, filename)
+        img = cv2.imread(img_path)
+        if img is not None:
+            img_embedding = extract_embedding(img)
+            embeddings.append(img_embedding)
+    return embeddings
+
+unrecognized_embeddings = load_unrecognized_embeddings()
+
+# Time threshold for saving unrecognized faces (in seconds)
+time_threshold = 5
+last_saved_time = time.time()
 
 while True:
     ret, frame = camera.read()
@@ -75,16 +90,16 @@ while True:
         
         # Verify if the detected face matches with the database
         matched_person = verify_face(detected_embedding, known_embeddings)
-        
+        matched_unrecognized = verify_face(detected_embedding, {"unrecognized": unrecognized_embeddings}, threshold=0.1)
+
         if matched_person:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)  # Draw a green rectangle around the matched face
             cv2.putText(frame, matched_person, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36,255,12), 2)
-        else:
-            # Save unrecognized face and its attributes
-            unrecognized_face_path = 'unrecognized_faces'
-            os.makedirs(unrecognized_face_path, exist_ok=True)
+        elif not matched_unrecognized and time.time() - last_saved_time > time_threshold:
+            last_saved_time = time.time()
             unrecognized_face_filename = f'unrecognized_face_{len(os.listdir(unrecognized_face_path)) + 1}.jpg'
             cv2.imwrite(os.path.join(unrecognized_face_path, unrecognized_face_filename), face_img)
+            unrecognized_embeddings.append(detected_embedding)  # Update the embeddings list
     
     # Display the frame with detected faces
     cv2.imshow('Real-time Face Matching', frame)
@@ -96,7 +111,3 @@ while True:
 # Release the camera and close the window
 camera.release()
 cv2.destroyAllWindows()
-# Release the camera and close the window
-camera.release()
-cv2.destroyAllWindows()
-
