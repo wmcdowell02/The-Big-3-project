@@ -63,7 +63,7 @@ def initialize_excel(file_name):
     return wb
 
 # Path to the unrecognized faces folder
-unrecognized_faces_folder = 'unrecognized_faces'
+unrecognized_faces_folder = '' # Add the path to the 'unrecognized_faces' folder generated in the detectingAndComparing.py file
 
 # Initialize the Excel workbook
 wb = initialize_excel(excel_file)
