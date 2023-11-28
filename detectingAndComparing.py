@@ -37,7 +37,7 @@ def verify_face(detected_embedding, database_embeddings, threshold=0.08):  # Adj
     return None  # Return None if no match is found
 
 # Load embeddings from the database folder
-database_path = 'C:/Users/Administrator/Desktop/App programming Project/The-Big-3-project-main/The-Big-3-project-main/best_faces'
+database_path = # Path to database of unknown faces detected and clipped
 known_embeddings = {}
 
 for person_folder in os.listdir(database_path):
